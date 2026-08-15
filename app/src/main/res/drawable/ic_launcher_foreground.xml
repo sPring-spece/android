@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 简化的电脑主板图形 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M34,30 h40 a4,4 0 0 1 4,4 v34 a4,4 0 0 1 -4,4 h-40 a4,4 0 0 1 -4,-4 v-34 a4,4 0 0 1 4,-4 z M38,38 h32 v18 h-32 z M38,60 h12 v6 h-12 z M54,60 h16 v6 h-16 z" />
+</vector>

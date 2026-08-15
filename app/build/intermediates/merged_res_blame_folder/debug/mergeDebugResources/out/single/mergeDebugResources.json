@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.pcassemble.app-debug-58:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.pcassemble.app-main-60:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.pcassemble.app-debug-58:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.pcassemble.app-main-60:/mipmap-anydpi-v26/ic_launcher.xml"
+    }
+]
