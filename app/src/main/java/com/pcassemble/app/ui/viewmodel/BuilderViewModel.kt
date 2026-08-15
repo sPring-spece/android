@@ -107,6 +107,7 @@ fun PartOut.toValidatePartIn() = ValidatePartIn(
     price = price,
     power_consumption = power_consumption,
     specs = specs,
+    image = image,
 )
 
 fun ValidatePartIn.toOrderPartIn() = OrderPartIn(
@@ -116,6 +117,7 @@ fun ValidatePartIn.toOrderPartIn() = OrderPartIn(
     price = price,
     power_consumption = power_consumption,
     specs = specs,
+    image = image,
 )
 
 fun OrderPartIn.toValidatePartIn() = ValidatePartIn(
@@ -125,6 +127,7 @@ fun OrderPartIn.toValidatePartIn() = ValidatePartIn(
     price = price,
     power_consumption = power_consumption,
     specs = specs,
+    image = image,
 )
 
 fun ValidatePartIn.toIssueParts(): List<String> = listOf(name)

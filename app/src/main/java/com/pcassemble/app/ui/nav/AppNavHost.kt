@@ -21,6 +21,7 @@ import com.pcassemble.app.ui.screens.OrderDetailScreen
 import com.pcassemble.app.ui.screens.OrderListScreen
 import com.pcassemble.app.ui.screens.PostDetailScreen
 import com.pcassemble.app.ui.screens.RecommendScreen
+import com.pcassemble.app.ui.screens.SettingsScreen
 
 object Routes {
     const val AUTH = "auth"
@@ -32,6 +33,7 @@ object Routes {
     const val CONSULT = "consult"
     const val NEW_POST = "new_post"
     const val RECOMMEND = "recommend"
+    const val SETTINGS = "settings"
 
     // 带参数路由的注册模式（含占位符）
     const val CONFIG = "config/{configId}"
@@ -56,6 +58,7 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
         composable(Routes.CONSULT) { ConsultScreen(navController) }
         composable(Routes.NEW_POST) { NewPostScreen(navController) }
         composable(Routes.RECOMMEND) { RecommendScreen(navController) }
+        composable(Routes.SETTINGS) { SettingsScreen(navController) }
         composable(
             Routes.CONFIG,
             arguments = listOf(navArgument("configId") { type = NavType.IntType }),

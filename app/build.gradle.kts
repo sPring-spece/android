@@ -18,7 +18,7 @@ android {
 
         // 后端地址：Android 模拟器访问宿主机用 10.0.2.2；真机调试改成电脑局域网 IP
         // 注意：Retrofit 要求 baseUrl 必须以 / 结尾
-        buildConfigField("String", "BASE_URL", "\"http://192.168.1.106:8000/api/\"")
+        buildConfigField("String", "BASE_URL", "\"http://192.168.1.101:8000/api/\"")
     }
 
     buildTypes {

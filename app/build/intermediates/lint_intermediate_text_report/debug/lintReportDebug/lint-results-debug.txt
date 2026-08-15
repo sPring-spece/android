@@ -1,4 +1,4 @@
-C:\Users\33398\AppData\Roaming\reasonix\global-workspace\pc-assemble-android\android\app\src\main\java\com\pcassemble\app\util\Formats.kt:37: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+C:\Users\33398\AppData\Roaming\reasonix\global-workspace\pc-assemble-android\android\app\src\main\java\com\pcassemble\app\util\Formats.kt:42: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
 fun money(price: Double): String = String.format("¥%,.2f", price)
                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

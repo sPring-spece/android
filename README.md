@@ -68,18 +68,19 @@ Composable(页面) ──collectAsState──> ViewModel(StateFlow) ──> Repo
 - **登录态**：`Repository.token`（内存）+ `AuthStore`（DataStore 持久化）；OkHttp 拦截器从 `AuthStore.cachedToken()` **同步**读取并自动加 `Authorization: Bearer` 头
 - **冷启动**：`Repository.sessionReady` 为 true 后 `MainScreen` 才决定是否跳登录页（避免已登录用户被强制重登）
 - **跨页共享**：选配器 → 下单确认页通过 `BuilderSession` 单例传数据（避免导航传复杂参数）
+- **服务器地址动态配置**：`AuthStore` 持久化用户改过的后端地址 → App 启动时 `Repository.initServerUrl()` 加载并重建 Retrofit；设置页改地址走 `Repository.reconfigureServer()` **立即重建 ApiService 并持久化**，无需重新安装（电脑 IP 变化不再影响联调）
 
 ---
 
-## 四、页面清单（12 个）
+## 四、页面清单（13 个）
 
 | 页面 | 路由 | 功能 |
 |------|------|------|
 | 登录/注册 | `auth` | JWT 登录、注册即登录 |
 | 主界面 | `main` | 底部导航（首页 / 社区 / 我的） |
-| 首页 | 内嵌 | 官方方案列表（价位段筛选）、预算配机入口 |
-| 方案详情 | `config/{id}` | 配件清单、收藏、克隆、按此方案选配 |
-| **选配器** | `builder` | ★ 8 类配件选择/替换、实时调 `/validate` 显示总价/功耗/兼容性问题、致命问题禁止下单 |
+| 首页 | 内嵌 | 官方方案列表（价位段筛选、**整机图卡片**）、预算配机入口、**DIY 组装入口** |
+| 方案详情 | `config/{id}` | 整机图 + 配件清单（**含配件图**）、收藏、克隆、按此方案选配 |
+| **选配器** | `builder` | ★ 8 类配件选择/替换（**候选列表与已选槽位显示真实配件图**）、实时调 `/validate` 显示总价/功耗/兼容性问题、致命问题禁止下单 |
 | 确认订单 | `order_confirm` | 收货信息 + 配件清单 + 提交 |
 | 订单列表 | `order_list` | 我的订单 |
 | 订单详情 | `order/{id}` | 状态时间线 + 支付/取消/确认收货 |
@@ -87,9 +88,10 @@ Composable(页面) ──collectAsState──> ViewModel(StateFlow) ──> Repo
 | 帖子详情 | `post/{id}` | 内容 + 评论 + 发评论 |
 | 发帖 | `new_post` | 标题 + 内容 |
 | 预算配机 | `recommend` | 输入预算 → 生成配置 → 一键进选配器 |
-| 我的 | 内嵌 | 用户信息 + 收藏/咨询/订单/配机入口 + 退出 |
+| 我的 | 内嵌 | 用户信息 + 收藏/咨询/订单/配机入口 + 服务器设置 + 退出 |
 | 收藏 | `favorites` | 收藏的配置单 |
 | 咨询 | `consult` | 提交咨询 + 历史回复 |
+| **服务器设置** | `settings` | ★ 修改后端地址（IP 变了不用重装）+ 测试连接 + 持久化 |
 
 ---
 
@@ -132,6 +134,8 @@ Composable(页面) ──collectAsState──> ViewModel(StateFlow) ──> Repo
 |----|------|
 | 明文 HTTP 仅 debug | `src/debug/AndroidManifest.xml` 单独放行；release 默认禁明文（安全审查要求） |
 | BASE_URL 兜底 | `Network.normalizeBaseUrl()` 自动补 `/`，配置漏写不崩溃 |
+| **服务器地址可配置** | 默认 `BuildConfig.BASE_URL`，设置页可改并持久化到 DataStore；`Repository` 持有 `@Volatile api`，改地址**立即重建 Retrofit 生效**，电脑 IP 变化无需重装 |
+| **配件图片** | 后端静态服务（`/static/images/...`），库中只存相对路径；`Repository.imageUrl()` 按当前后端地址拼完整 URL，Coil 按需加载（跟随设置页改地址） |
 | Token 明文存储 | DataStore 私有目录 + `allowBackup=false`；生产可换 EncryptedSharedPreferences |
 | 日志脱敏 | OkHttp 日志仅 debug 开启 BODY（联调用）；release 关闭 |
 | specs 解析 | 后端 `specs` 为 JSON 对象，DTO 用 `JsonObject?` + `specText(key)` 安全读取 |
@@ -147,6 +151,7 @@ Composable(页面) ──collectAsState──> ViewModel(StateFlow) ──> Repo
 | 登录/注册成功闪退 | `popUpTo` 目标不在回退栈 | 已改为 `popUpTo(AUTH)` |
 | 请求超时 | uvicorn 未绑 `0.0.0.0` / 防火墙拦截 / IP 不对 | 见上「运行步骤 2、3」 |
 | 提示"无法连接服务器" | 后端未启动或 IP 不通 | 手机浏览器访问 `http://IP:8000/health` 自测 |
+| **电脑 IP 变了连不上** | BASE_URL 写死了旧 IP | 「我的 → 服务器设置」改新 IP → 测试连接 → 保存，**无需重装** |
 | 已登录却每次要重登 | 旧包行为（已修复） | 装最新 APK，冷启动会等 `sessionReady` |
 
 > 抓崩溃日志：Android Studio Logcat 过滤 `FATAL EXCEPTION`，或 `adb logcat -s AndroidRuntime:E`。

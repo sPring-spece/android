@@ -179,7 +179,7 @@ document.getElementById(id).style.display = 'none';
     <div class="mdl-layout__header-row">
       <span class="mdl-layout-title">Lint Report: 4 warnings</span>
       <div class="mdl-layout-spacer"></div>
-      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Fri Aug 14 00:04:31 CST 2026 by AGP (8.7.3)</nav>
+      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Sat Aug 15 23:16:41 CST 2026 by AGP (8.7.3)</nav>
     </div>
   </header>
   <div class="mdl-layout__drawer">
@@ -241,11 +241,14 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/java/com/pcassemble/app/util/Formats.kt">../../src/main/java/com/pcassemble/app/util/Formats.kt</a>:37</span>: <span class="message">Implicitly using the default locale is a common source of bugs: Use <code>String.format(Locale, ...)</code> instead</span><br /><pre class="errorlines">
-<span class="lineno"> 34 </span>}
-<span class="lineno"> 35 </span>
-<span class="lineno"> 36 </span><span class="javadoc">/** 金额格式化：1234.5 -> 1,234.50 元 */</span>
-<span class="caretline"><span class="lineno"> 37 </span><span class="keyword">fun</span> money(price: Double): String = <span class="warning">String.format(<span class="string">"¥%,.2f"</span>, price)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="location"><a href="../../src/main/java/com/pcassemble/app/util/Formats.kt">../../src/main/java/com/pcassemble/app/util/Formats.kt</a>:42</span>: <span class="message">Implicitly using the default locale is a common source of bugs: Use <code>String.format(Locale, ...)</code> instead</span><br /><pre class="errorlines">
+<span class="lineno"> 39 </span>}
+<span class="lineno"> 40 </span>
+<span class="lineno"> 41 </span><span class="javadoc">/** 金额格式化：1234.5 -> 1,234.50 元 */</span>
+<span class="caretline"><span class="lineno"> 42 </span><span class="keyword">fun</span> money(price: Double): String = <span class="warning">String.format(<span class="string">"¥%,.2f"</span>, price)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 43 </span>
+<span class="lineno"> 44 </span><span class="javadoc">/** 从 specs(JsonObject) 安全取值：支持字符串与数组（DDR4/DDR5 合并展示） */</span>
+<span class="lineno"> 45 </span><span class="keyword">fun</span> specValue(specs: JsonObject?, key: String): String? {
 </pre>
 
 </div>

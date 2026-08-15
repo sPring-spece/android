@@ -19,9 +19,12 @@ class PcAssembleApp : Application() {
     override fun onCreate() {
         super.onCreate()
         val authStore = AuthStore(this)
-        val api = Network.createApi(tokenProvider = { authStore.cachedToken() })
+        val api = Network.createApi(baseUrl = Network.currentBaseUrl()) { authStore.cachedToken() }
         repository = Repository(api, authStore)
-        // 恢复登录态（token 失效会自动清除）
-        appScope.launch { repository.restoreSession() }
+        // 恢复登录态：先加载持久化的服务器地址（用户改过则覆盖默认），再恢复 token
+        appScope.launch {
+            repository.initServerUrl()
+            repository.restoreSession()
+        }
     }
 }

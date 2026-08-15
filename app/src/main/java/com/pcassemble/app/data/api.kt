@@ -4,6 +4,7 @@ import com.pcassemble.app.BuildConfig
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -128,10 +129,16 @@ object Network {
     val json = Json { ignoreUnknownKeys = true; coerceInputValues = true }
 
     /** Retrofit 要求 baseUrl 以 / 结尾，这里兜底规整，避免配置漏写斜杠导致启动崩溃 */
-    private fun normalizeBaseUrl(url: String): String =
+    fun normalizeBaseUrl(url: String): String =
         if (url.endsWith("/")) url else "$url/"
 
-    fun createApi(tokenProvider: () -> String?): ApiService {
+    /** 编译期默认后端地址（设置页未改过时使用） */
+    fun currentBaseUrl(): String = BuildConfig.BASE_URL
+
+    fun createApi(
+        baseUrl: String = BuildConfig.BASE_URL,
+        tokenProvider: () -> String?,
+    ): ApiService {
         val authInterceptor = okhttp3.Interceptor { chain ->
             val token = tokenProvider()
             val request = if (token != null) {
@@ -153,11 +160,29 @@ object Network {
             .readTimeout(30, TimeUnit.SECONDS)
             .build()
         return Retrofit.Builder()
-            .baseUrl(normalizeBaseUrl(BuildConfig.BASE_URL))
+            .baseUrl(normalizeBaseUrl(baseUrl))
             .client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(ApiService::class.java)
+    }
+
+    /** 测试后端连通性：从 baseUrl 提取主机请求根路径 /health（不依赖 Retrofit） */
+    fun checkHealth(baseUrl: String): Boolean {
+        return try {
+            val url = normalizeBaseUrl(baseUrl).toHttpUrl()
+            val healthUrl = "${url.scheme}://${url.host}:${url.port}/health"
+            val client = OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
+                .build()
+            val resp = client.newCall(
+                okhttp3.Request.Builder().url(healthUrl).build()
+            ).execute()
+            resp.use { it.isSuccessful }
+        } catch (_: Exception) {
+            false
+        }
     }
 
     /** 从后端错误响应体解析 detail 消息 */

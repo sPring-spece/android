@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,9 +35,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.pcassemble.app.PcAssembleApp
 import com.pcassemble.app.data.ConfigOut
 import com.pcassemble.app.ui.nav.Routes
@@ -91,6 +97,31 @@ fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) 
                 }
             }
 
+            // DIY 装机入口
+            item {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { navController.navigate(Routes.BUILDER) },
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(Icons.Filled.Build, contentDescription = null)
+                        Spacer(Modifier.width(12.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text("DIY 组装", style = MaterialTheme.typography.titleMedium)
+                            Text("从零开始挑选配件，实时兼容性校验", style = MaterialTheme.typography.bodySmall)
+                        }
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+                    }
+                }
+            }
+
             // 价位段筛选
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -121,23 +152,38 @@ fun HomeScreen(navController: NavHostController, modifier: Modifier = Modifier) 
 
 @Composable
 fun ConfigCard(config: ConfigOut, onClick: () -> Unit) {
+    val context = LocalContext.current
+    val repo = (context.applicationContext as PcAssembleApp).repository
     Card(modifier = Modifier
         .fillMaxWidth()
         .clickable(onClick = onClick)) {
-        Column(Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(config.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                Text(levelLabel(config.level), style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary)
+        Column {
+            if (config.image != null) {
+                AsyncImage(
+                    model = repo.imageUrl(config.image),
+                    contentDescription = config.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(4f / 3f)
+                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
+                    contentScale = ContentScale.Crop,
+                )
             }
-            Spacer(Modifier.height(4.dp))
-            config.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
-            Spacer(Modifier.height(8.dp))
-            Row {
-                Text(money(config.price), style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.weight(1f))
-                Text("${config.parts.size} 件配件 · 销量 ${config.sales}", style = MaterialTheme.typography.bodySmall)
+            Column(Modifier.padding(16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(config.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                    Text(levelLabel(config.level), style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary)
+                }
+                Spacer(Modifier.height(4.dp))
+                config.description?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                Spacer(Modifier.height(8.dp))
+                Row {
+                    Text(money(config.price), style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error)
+                    Spacer(Modifier.weight(1f))
+                    Text("${config.parts.size} 件配件 · 销量 ${config.sales}", style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
     }

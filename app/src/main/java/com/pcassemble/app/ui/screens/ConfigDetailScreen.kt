@@ -5,13 +5,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
@@ -34,9 +37,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.pcassemble.app.PcAssembleApp
 import com.pcassemble.app.data.ConfigOut
 import com.pcassemble.app.ui.nav.Routes
@@ -86,6 +92,18 @@ fun ConfigDetailScreen(navController: NavHostController, configId: Int) {
             ) {
                 item {
                     Column {
+                        if (cfg.image != null) {
+                            AsyncImage(
+                                model = repo.imageUrl(cfg.image),
+                                contentDescription = cfg.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(4f / 3f)
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop,
+                            )
+                            Spacer(Modifier.height(12.dp))
+                        }
                         Text(cfg.name, style = MaterialTheme.typography.headlineSmall)
                         Spacer(Modifier.height(4.dp))
                         Text(
@@ -108,6 +126,17 @@ fun ConfigDetailScreen(navController: NavHostController, configId: Int) {
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        if (part.part_image != null) {
+                            AsyncImage(
+                                model = repo.imageUrl(part.part_image),
+                                contentDescription = part.part_name,
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop,
+                            )
+                            Spacer(Modifier.width(10.dp))
+                        }
                         Text(
                             partTypeLabel(part.part_type),
                             style = MaterialTheme.typography.labelLarge,

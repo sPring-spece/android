@@ -7,12 +7,12 @@
         message="Implicitly using the default locale is a common source of bugs: Use `String.format(Locale, ...)` instead">
         <location
             file="${:app*debug*MAIN*sourceProvider*0*javaDir*0}/com/pcassemble/app/util/Formats.kt"
-            line="37"
+            line="42"
             column="36"
-            startOffset="800"
-            endLine="37"
+            startOffset="986"
+            endLine="42"
             endColumn="66"
-            endOffset="830"/>
+            endOffset="1016"/>
     </incident>
 
     <incident

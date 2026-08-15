@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Headset
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -74,6 +75,9 @@ fun MineScreen(navController: NavHostController, modifier: Modifier = Modifier) 
             }
             MenuItem(Icons.Filled.Headset, "在线咨询", "装机问题找工程师") {
                 navController.navigate(Routes.CONSULT)
+            }
+            MenuItem(Icons.Filled.Settings, "服务器设置", "后端地址变了在这里改，无需重装") {
+                navController.navigate(Routes.SETTINGS)
             }
             MenuItem(Icons.Filled.Logout, "退出登录", "清除本地登录状态") {
                 vm.logout {

@@ -1,5 +1,10 @@
 package com.pcassemble.app.util
 
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+
 /** 配件类型英文 → 中文展示 */
 val PART_TYPE_LABELS = mapOf(
     "cpu" to "CPU",
@@ -35,3 +40,31 @@ fun levelLabel(level: String): String = when (level) {
 
 /** 金额格式化：1234.5 -> 1,234.50 元 */
 fun money(price: Double): String = String.format("¥%,.2f", price)
+
+/** 从 specs(JsonObject) 安全取值：支持字符串与数组（DDR4/DDR5 合并展示） */
+fun specValue(specs: JsonObject?, key: String): String? {
+    val el = specs?.get(key) ?: return null
+    return when (el) {
+        is JsonPrimitive -> el.contentOrNull
+        is JsonArray -> el.joinToString("/") { (it as? JsonPrimitive)?.contentOrNull ?: "" }
+        else -> null
+    }
+}
+
+/** 配件关键规格摘要（DIY 页面展示用） */
+fun partSpecSummary(type: String, specs: JsonObject?): String {
+    if (specs == null) return ""
+    val keys = when (type) {
+        "cpu" -> listOf("socket", "cores")
+        "motherboard" -> listOf("socket", "formFactor", "memoryType")
+        "memory" -> listOf("memoryType", "capacity")
+        "gpu" -> listOf("capacity", "interface")
+        "storage" -> listOf("capacity")
+        "psu" -> listOf("power")
+        "case" -> listOf("formFactor")
+        "cooler" -> listOf("socket")
+        else -> emptyList()
+    }
+    val items = keys.mapNotNull { specValue(specs, it) }.filter { it.isNotBlank() }
+    return items.joinToString(" · ").take(48)
+}

@@ -55,6 +55,7 @@ data class ConfigPartOut(
     val part_price: Double,
     val part_power: Int = 0,
     val part_specs: JsonObject? = null,
+    val part_image: String? = null,
 )
 
 @Serializable
@@ -67,6 +68,7 @@ data class ConfigOut(
     val price: Double,
     val sales: Int = 0,
     val is_official: Int = 0,
+    val image: String? = null,
     val parts: List<ConfigPartOut> = emptyList(),
 )
 
@@ -82,6 +84,7 @@ data class ValidatePartIn(
     val price: Double = 0.0,
     val power_consumption: Int = 0,
     val specs: JsonObject? = null,
+    val image: String? = null,  // 仅客户端本地展示用，后端会忽略
 )
 
 @Serializable
@@ -123,6 +126,7 @@ data class OrderPartIn(
     val price: Double = 0.0,
     val power_consumption: Int = 0,
     val specs: JsonObject? = null,
+    val image: String? = null,  // 仅客户端本地展示用，后端会忽略
 )
 
 @Serializable

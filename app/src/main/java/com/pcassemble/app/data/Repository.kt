@@ -1,14 +1,30 @@
 package com.pcassemble.app.data
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import okhttp3.HttpUrl.Companion.toHttpUrl
 
-/** 全局数据仓库：持有登录态，封装业务调用 */
+/** 全局数据仓库：持有登录态，封装业务调用；支持动态切换后端地址 */
 class Repository(
-    private val api: ApiService,
+    initialApi: ApiService,
     private val authStore: AuthStore,
 ) {
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    @Volatile
+    private var api: ApiService = initialApi
+
+    @Volatile
+    private var currentBaseUrl: String = Network.currentBaseUrl()
+
+    private val _serverUrl = MutableStateFlow<String?>(null)
+    val serverUrl: StateFlow<String?> = _serverUrl.asStateFlow()
+
     private val _token = MutableStateFlow<String?>(null)
     val token: StateFlow<String?> = _token.asStateFlow()
 
@@ -35,6 +51,41 @@ class Repository(
             }
         } finally {
             _sessionReady.value = true
+        }
+    }
+
+    // ---------- 服务器地址动态配置 ----------
+
+    /** 启动时读取持久化的服务器地址（若用户改过则覆盖默认值） */
+    suspend fun initServerUrl() {
+        val saved = authStore.getServerUrl()
+        if (saved != null && saved.isNotBlank()) {
+            currentBaseUrl = saved
+            _serverUrl.value = saved
+            api = Network.createApi(baseUrl = saved) { authStore.cachedToken() }
+        } else {
+            _serverUrl.value = Network.currentBaseUrl()
+        }
+    }
+
+    /** 设置页：切换后端地址，持久化并立即重建 Retrofit（IP 变化无需重装） */
+    fun reconfigureServer(url: String) {
+        val normalized = Network.normalizeBaseUrl(url)
+        currentBaseUrl = normalized
+        api = Network.createApi(baseUrl = normalized) { authStore.cachedToken() }
+        _serverUrl.value = normalized
+        appScope.launch { authStore.saveServerUrl(normalized) }
+    }
+
+    /** 相对图片路径 → 完整 URL（按当前后端地址拼，跟随设置页改动） */
+    fun imageUrl(path: String?): String? {
+        if (path.isNullOrBlank()) return null
+        if (path.startsWith("http")) return path
+        return try {
+            val base = Network.normalizeBaseUrl(currentBaseUrl).toHttpUrl()
+            "${base.scheme}://${base.host}:${base.port}$path"
+        } catch (_: Exception) {
+            null
         }
     }
 
