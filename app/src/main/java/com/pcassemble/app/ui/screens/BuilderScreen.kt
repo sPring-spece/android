@@ -224,7 +224,8 @@ fun BuilderScreen(navController: NavHostController) {
                     item {
                         Text("兼容性检查（${v.issues.size} 项）", style = MaterialTheme.typography.titleSmall)
                     }
-                    items(v.issues, key = { it.code + it.message }) { issue ->
+                    // 不设 key：不同规则可能产生相同 code+message，key 重复会导致 LazyColumn 崩溃
+                    items(v.issues) { issue ->
                         IssueItem(issue)
                     }
                 }

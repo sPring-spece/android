@@ -35,7 +35,18 @@ class BuilderViewModel(private val repo: Repository) : ViewModel() {
         viewModelScope.launch {
             _loading.value = true
             try {
-                val all = repo.parts()
+                // 按 8 类分页拉全量（后端单次最多 100 条，需翻页到 total）
+                val all = mutableListOf<PartOut>()
+                val types = listOf("cpu", "motherboard", "gpu", "memory", "storage", "psu", "case", "cooler")
+                for (type in types) {
+                    var page = 1
+                    while (true) {
+                        val res = repo.partsPage(type, page, pageSize = 100)
+                        all += res.items
+                        if (page * 100 >= res.total) break
+                        page++
+                    }
+                }
                 _catalog.value = all.groupBy { it.type }
                 // 从共享会话恢复（方案详情进入时已预填）
                 if (_selected.value.isEmpty() && BuilderSession.parts.isNotEmpty()) {

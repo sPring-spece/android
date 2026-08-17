@@ -119,7 +119,8 @@ fun ConfigDetailScreen(navController: NavHostController, configId: Int) {
                             color = MaterialTheme.colorScheme.error)
                     }
                 }
-                items(cfg.parts, key = { it.part_type + it.part_name }) { part ->
+                // 不设 key：不同配件可能产生相同的 part_type+part_name（如同一型号出现两次），key 重复会导致 LazyColumn 崩溃
+                items(cfg.parts) { part ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

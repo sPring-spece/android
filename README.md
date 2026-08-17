@@ -152,6 +152,8 @@ Composable(页面) ──collectAsState──> ViewModel(StateFlow) ──> Repo
 | 请求超时 | uvicorn 未绑 `0.0.0.0` / 防火墙拦截 / IP 不对 | 见上「运行步骤 2、3」 |
 | 提示"无法连接服务器" | 后端未启动或 IP 不通 | 手机浏览器访问 `http://IP:8000/health` 自测 |
 | **电脑 IP 变了连不上** | BASE_URL 写死了旧 IP | 「我的 → 服务器设置」改新 IP → 测试连接 → 保存，**无需重装** |
+| DIY 页面只有部分类型有配件 | 配件库默认只加载 50 条（分页未拉全） | 已修复：按 8 类分页循环拉全量（1326 条） |
+| 点击某个方案闪退 | 方案配件快照混入残留数据（同一配件重复）→ 列表 key 重复 | 已修复：导入清理残留 + 列表不设 key（重装新包） |
 | 已登录却每次要重登 | 旧包行为（已修复） | 装最新 APK，冷启动会等 `sessionReady` |
 
 > 抓崩溃日志：Android Studio Logcat 过滤 `FATAL EXCEPTION`，或 `adb logcat -s AndroidRuntime:E`。

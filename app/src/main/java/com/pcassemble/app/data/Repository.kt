@@ -117,6 +117,10 @@ class Repository(
     suspend fun parts(type: String? = null, keyword: String? = null): List<PartOut> =
         api.parts(type = type, keyword = keyword).items
 
+    /** 分页查询配件（含 total），DIY 页面按类型拉全量用 */
+    suspend fun partsPage(type: String?, page: Int, pageSize: Int): PartListOut =
+        api.parts(type = type, keyword = null, page = page, pageSize = pageSize)
+
     suspend fun configs(scope: String = "official", level: String? = null): List<ConfigOut> =
         api.configs(scope = scope, level = level).items
 
